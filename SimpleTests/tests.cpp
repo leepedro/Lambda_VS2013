@@ -65,9 +65,11 @@ void TestAccessExternalVariables(void)
 	// Assign the content of a vector using an algorithm function, and a lambda expression.
 	// Capture only a specific (local) external variable as a value, but it is NOT modifiable.
 	std::generate(v3.begin(), v3.end(),
-		[value3]() {
+		[value3]()
+	{
 		//int a = value2;
-		return value3; });				// {3, 3, 3, 3, 3}
+		return value3;
+	});				// {3, 3, 3, 3, 3}
 
 	// Print the content.
 	std::for_each(v3.cbegin(), v3.cend(), [](const int &n) { std::cout << n; });
@@ -76,7 +78,11 @@ void TestAccessExternalVariables(void)
 	// Assign the content of a vector using an algorithm function, and a lambda expression.
 	// Can access any (local) external variable as a value, but it IS modifiable as the lambda expression is declared as mutable.
 	// Q. Then, how is mutable different from using references?
-	std::generate(v4.begin(), v4.end(), [=]() mutable { ++value4; return ++value5; });		// {6, 7, 8, 9, 10}
+	std::generate(v4.begin(), v4.end(), [=]() mutable
+	{
+		++value4;
+		return ++value5;
+	});		// {6, 7, 8, 9, 10}
 
 	// Print the content.
 	// The referred external variables are NOT modified because they were copied by value. 
@@ -85,10 +91,11 @@ void TestAccessExternalVariables(void)
 
 	// Assign the content of a vector using an algorithm function, and a lambda expression.
 	// Can access any (local) external variable as a reference, and it IS modifiable.
-	std::generate(v5.begin(), v5.end(),
-		[&]() {
+	std::generate(v5.begin(), v5.end(), [&]()	
+	{
 		++value6;
-		return ++value7; });		// {8, 9, 10, 11, 12}
+		return ++value7;
+	});		// {8, 9, 10, 11, 12}
 
 	// Print the content.
 	// The referred external variables ARE modified because they were copied by value. 

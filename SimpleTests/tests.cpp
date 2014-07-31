@@ -1,6 +1,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <ppl.h>
 
 void CompareExpressions(void)
 {
@@ -42,7 +43,7 @@ void CompareExpressions(void)
 void TestAccessExternalVariables(void)
 {
 	std::cout << std::endl << "TestAccessExternalVariables()" << std::endl;
-	std::vector<int> v1(5), v2(5), v3(5), v4(5), v5(5), v6(5);
+	std::vector<int> v1(5), v2(5), v3(5), v4(5), v5(5), v6(5), v7(5);
 	int value1(1), value2(2), value3(3), value4(4), value5(5), value6(6), value7(7), value8(8);
 
 	// Assign the content of a vector using an algorithm function, and a lambda expression.
@@ -104,10 +105,39 @@ void TestAccessExternalVariables(void)
 	// Print the content.
 	std::for_each(v6.cbegin(), v6.cend(), [](const int &n) { std::cout << n; });
 	std::cout << std::endl << value8 << std::endl;												// 13
+
+	// Read the content of a vector, do something, and update the content to a new vector.
+	std::transform(v6.cbegin(), v6.cend(), v7.begin(), [](const int &n) { return n + 1; });		// v6 + 1
+	std::for_each(v7.cbegin(), v7.cend(), [](const int &n) {std::cout << n; });
+	std::cout << std::endl;
+}
+
+void TestPPL(void)
+{
+	std::vector<int> v1(5);
+	int src_1(1);
+	std::vector<int> v_src_1 = { 1, 2, 3, 4, 5 };
+	std::vector<int> v_dst_1(5), v_dst_2(5);
+
+	std::cout << std::endl << "TestPPL()" << std::endl;
+
+	// Assign the content of a vector with a serial algorithm function and a lambda expression.
+	// Capture only a specific (local) external value as a value, so it can be used as an input but it is not modifiable.
+	std::generate(v_dst_1.begin(), v_dst_1.end(), [src_1]() { return src_1; });
+
+	// Print the content of a vector with a serial algorithm function and a lambda expression.
+	std::for_each(v_dst_1.cbegin(), v_dst_1.cend(), [](const int &n) { std::cout << n; });	// {1, 1, 1, 1, 1}
+	std::cout << std::endl;
+
+	// Read the content of a vector with a parallel algorithm function, do something, and update the content to a new vector.
+	concurrency::parallel_transform(v_src_1.cbegin(), v_src_1.cend(), v_dst_2.begin(), [](const int &n) { return n + 1; });
+	std::for_each(v_dst_2.cbegin(), v_dst_2.cend(), [](const int &n) { std::cout << n; });	// {2, 3, 4, 5, 6}
+	std::cout << std::endl;
 }
 
 int main(void)
 {
 	CompareExpressions();
 	TestAccessExternalVariables();
+	TestPPL();
 }
